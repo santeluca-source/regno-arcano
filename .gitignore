@@ -1,0 +1,14 @@
+# File di Roblox Studio: binari che cambiano a ogni salvataggio.
+# Tutto il gioco è generato dal codice in src/, quindi non servono nella cronologia.
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+
+# Generati dagli strumenti
+sourcemap.json
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -1,0 +1,74 @@
+{
+  "name": "RegnoArcano",
+  "tree": {
+    "$className": "DataModel",
+
+    "ReplicatedStorage": {
+      "Shared": {
+        "$path": "src/shared"
+      },
+      "Remotes": {
+        "$className": "Folder",
+        "CambiaClasse": {
+          "$className": "RemoteEvent"
+        },
+        "Notifica": {
+          "$className": "RemoteEvent"
+        },
+        "ApriMenuClassi": {
+          "$className": "RemoteEvent"
+        },
+        "UsaAbilita": {
+          "$className": "RemoteEvent"
+        },
+        "Danno": {
+          "$className": "RemoteEvent"
+        },
+        "InventarioAggiornato": {
+          "$className": "RemoteEvent"
+        },
+        "AzioneInventario": {
+          "$className": "RemoteEvent"
+        },
+        "OttieniInventario": {
+          "$className": "RemoteFunction"
+        },
+        "UsaSpeciale": {
+          "$className": "RemoteEvent"
+        },
+        "SpecialeUsato": {
+          "$className": "RemoteEvent"
+        },
+        "UsaPozione": {
+          "$className": "RemoteEvent"
+        },
+        "PozioneUsata": {
+          "$className": "RemoteEvent"
+        },
+        "ApriFabbro": {
+          "$className": "RemoteEvent"
+        },
+        "ScambioEvento": {
+          "$className": "RemoteEvent"
+        },
+        "AzioneScambio": {
+          "$className": "RemoteEvent"
+        }
+      }
+    },
+
+    "ServerScriptService": {
+      "Server": {
+        "$path": "src/server"
+      }
+    },
+
+    "StarterPlayer": {
+      "StarterPlayerScripts": {
+        "Client": {
+          "$path": "src/client"
+        }
+      }
+    }
+  }
+}
