@@ -1,4 +1,5 @@
--- Menu dell'inventario: si apre con il tasto I o con il pulsante in alto a destra.
+-- Menu dell'inventario: si apre e si chiude con il tasto X o con il pulsante in basso
+-- a destra; si chiude anche con la X sulla finestra.
 -- Mostra gli oggetti, permette di indossarli, toglierli e venderli per Frammenti.
 -- Il client chiede soltanto: ogni azione viene controllata ed eseguita dal server.
 
@@ -76,7 +77,7 @@ local apri = bottone({
 	Size = UDim2.fromOffset(140, 34),
 	BackgroundColor3 = palette.bordo,
 	TextColor3 = palette.testo,
-	Text = "INVENTARIO (I)",
+	Text = "INVENTARIO (X)",
 	Parent = gui,
 })
 
@@ -462,6 +463,10 @@ end
 -- Interazioni ----------------------------------------------------------------------
 
 local function mostra(visibile, fabbro)
+	if visibile then
+		adatta() -- ricalcola le dimensioni: lo schermo potrebbe essere cambiato
+		gui.Enabled = true
+	end
 	finestra.Visible = visibile
 	player:SetAttribute("Finestra_Inventario", visibile) -- libera il cursore (Visuale.client)
 	stato.fabbro = visibile and fabbro == true
@@ -485,9 +490,25 @@ bMigliora.Activated:Connect(function()
 		AzioneInventario:FireServer("Migliora", stato.selezionato)
 	end
 end)
-UserInputService.InputBegan:Connect(function(input, gestito)
-	if not gestito and input.KeyCode == Enum.KeyCode.I then
+-- Tasto X: apre e chiude l'inventario (non usiamo I perché la telecamera di Roblox
+-- lo usa per lo zoom). Contro la ripetizione automatica della tastiera, una pressione
+-- conta solo se da 0,6 secondi non è arrivato nessun altro evento del tasto.
+local TASTO_INVENTARIO = Enum.KeyCode.X
+local ultimoEventoTasto = -math.huge
+UserInputService.InputBegan:Connect(function(input)
+	if input.KeyCode ~= TASTO_INVENTARIO or UserInputService:GetFocusedTextBox() then
+		return
+	end
+	local ora = os.clock()
+	local fresca = ora - ultimoEventoTasto > 0.6
+	ultimoEventoTasto = ora
+	if fresca then
 		alterna()
+	end
+end)
+UserInputService.InputEnded:Connect(function(input)
+	if input.KeyCode == TASTO_INVENTARIO then
+		ultimoEventoTasto = os.clock()
 	end
 end)
 

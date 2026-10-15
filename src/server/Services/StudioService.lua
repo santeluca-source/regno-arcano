@@ -3,7 +3,9 @@
 --
 --   /risorse   +50000 Oro, +15000 Essenza, +200 Frammenti
 --   /oggetti   8 oggetti casuali nell'inventario
---   /centro    elenca nell'Output gli oggetti estranei nella zona della Piazza
+--   /centro    elenca gli oggetti estranei nella zona della Piazza (Output + notifica)
+--   /pulisci   rimuove quegli oggetti per la partita in corso
+--   /script    elenca gli script del place che non fanno parte del progetto
 --   /reset     cancella i progressi (dati di sessione: si salvano all'uscita!)
 
 local Players = game:GetService("Players")
@@ -32,7 +34,7 @@ function comandi.oggetti(player)
 		local oggetto = InventarioService.Genera(InventarioService.SlotCasuale(), Rarita.Estrai(tabella, rng), "di Prova")
 		InventarioService.Aggiungi(player, oggetto)
 	end
-	return "Test: 8 oggetti aggiunti. Premi I per l'inventario."
+	return "Test: 8 oggetti aggiunti. Premi X per l'inventario."
 end
 
 function comandi.reset(player)
@@ -53,9 +55,16 @@ function comandi.reset(player)
 end
 
 -- Diagnosi: cosa c'è al centro del mondo (dove sta la Piazza) che NON è stato
--- creato dal nostro codice? Stampa nell'Output il percorso di ogni oggetto trovato.
-local CARTELLE_NOSTRE = { "Piazza", "Isole", "Dungeon", "Effetti", "Alleati" }
+-- creato dal nostro codice? Elenca il percorso di ogni oggetto trovato, nell'Output
+-- e come notifica sullo schermo. Il pavimento base del place (Baseplate) e i punti
+-- di spawn sono normali e vengono ignorati.
+local CARTELLE_NOSTRE = { "Piazza", "Isole", "Dungeon", "Effetti", "Alleati", "EffettiMovimento" }
 
+local function ignorato(contenitore)
+	return contenitore.Name == "Baseplate" or contenitore:IsA("SpawnLocation") or contenitore:IsA("Terrain")
+end
+
+-- Restituisce le righe di testo e gli oggetti trovati (per /pulisci).
 local function oggettiEstraneiAlCentro()
 	local Workspace = game:GetService("Workspace")
 	local nostre = {}
@@ -78,7 +87,7 @@ local function oggettiEstraneiAlCentro()
 			contenitore = contenitore.Parent
 		end
 		local isPersonaggio = contenitore:IsA("Model") and Players:GetPlayerFromCharacter(contenitore)
-		if not isPersonaggio and not parte:IsA("Terrain") then
+		if not isPersonaggio and not ignorato(contenitore) then
 			if not trovati[contenitore] then
 				trovati[contenitore] = 0
 				table.insert(ordine, contenitore)
@@ -91,20 +100,100 @@ local function oggettiEstraneiAlCentro()
 	for _, contenitore in ipairs(ordine) do
 		table.insert(righe, string.format("%s (%s, %d parti)", contenitore:GetFullName(), contenitore.ClassName, trovati[contenitore]))
 	end
-	return righe
+	return righe, ordine
 end
 
+-- Stampa nell'Output e, se c'è qualcosa, lo mostra a tutti i giocatori come notifica.
 local function stampaDiagnosi()
 	local righe = oggettiEstraneiAlCentro()
 	if #righe == 0 then
 		print("[Regno Arcano] Diagnosi centro: nessun oggetto estraneo nella Piazza.")
-	else
-		warn("[Regno Arcano] Diagnosi centro: oggetti NON creati dal nostro codice nella zona della Piazza:")
-		for _, riga in ipairs(righe) do
-			warn("   - " .. riga)
-		end
+		return 0
+	end
+	warn("[Regno Arcano] Diagnosi centro: oggetti NON creati dal nostro codice nella zona della Piazza:")
+	for _, riga in ipairs(righe) do
+		warn("   - " .. riga)
+	end
+	local testo = "Oggetto estraneo nella Piazza: " .. righe[1]
+		.. (#righe > 1 and (" (+" .. (#righe - 1) .. " altri, vedi Output)") or "")
+	for _, player in ipairs(Players:GetPlayers()) do
+		ReplicatedStorage.Remotes.Notifica:FireClient(player, testo)
 	end
 	return #righe
+end
+
+-- Diagnosi: script nel place che NON fanno parte del nostro progetto Rojo
+-- (esclusi quelli standard che Roblox aggiunge da solo).
+-- Un vecchio script dimenticato può ricreare oggetti del prototipo a ogni avvio.
+local SERVIZI_DA_CONTROLLARE = {
+	"Workspace", "ServerScriptService", "ServerStorage", "ReplicatedStorage", "ReplicatedFirst",
+	"StarterGui", "StarterPack", "StarterPlayer", "Lighting", "SoundService",
+}
+
+local function scriptEstranei()
+	local starterPlayer = game:GetService("StarterPlayer")
+	local candidati = {
+		-- I nostri, sincronizzati da Rojo.
+		{ game:GetService("ServerScriptService"), "Server" },
+		{ game:GetService("ReplicatedStorage"), "Shared" },
+		{ starterPlayer.StarterPlayerScripts, "Client" },
+		-- Quelli che Roblox inserisce da solo (telecamera, controlli, suoni dei passi).
+		{ starterPlayer, "PlayerModule" },
+		{ starterPlayer.StarterPlayerScripts, "PlayerModule" },
+		{ starterPlayer.StarterPlayerScripts, "RbxCharacterSounds" },
+	}
+	local nostri = {}
+	for _, candidato in ipairs(candidati) do
+		local radice = candidato[1]:FindFirstChild(candidato[2])
+		if radice then
+			table.insert(nostri, radice)
+		end
+	end
+
+	local function eNostro(oggetto)
+		for _, radice in ipairs(nostri) do
+			if oggetto == radice or oggetto:IsDescendantOf(radice) then
+				return true
+			end
+		end
+		-- Gli script dei personaggi (Animate, Health...) sono di Roblox.
+		local modello = oggetto:FindFirstAncestorOfClass("Model")
+		return modello ~= nil and Players:GetPlayerFromCharacter(modello) ~= nil
+	end
+
+	local trovati = {}
+	for _, nomeServizio in ipairs(SERVIZI_DA_CONTROLLARE) do
+		pcall(function()
+			for _, oggetto in ipairs(game:GetService(nomeServizio):GetDescendants()) do
+				if oggetto:IsA("LuaSourceContainer") and not eNostro(oggetto) then
+					table.insert(trovati, oggetto:GetFullName() .. " (" .. oggetto.ClassName .. ")")
+				end
+			end
+		end)
+	end
+	return trovati
+end
+
+local function stampaScriptEstranei()
+	local trovati = scriptEstranei()
+	if #trovati == 0 then
+		print("[Regno Arcano] Nessuno script estraneo nel place.")
+		return
+	end
+	warn("[Regno Arcano] Script nel place che NON fanno parte del progetto (controlla ed elimina quelli vecchi):")
+	for _, riga in ipairs(trovati) do
+		warn("   - " .. riga)
+	end
+	-- L'elenco completo appare anche in un pannello sullo schermo (il testo si può copiare).
+	for _, player in ipairs(Players:GetPlayers()) do
+		ReplicatedStorage.Remotes.Diagnosi:FireClient(player,
+			#trovati .. " script nel place che NON fanno parte del progetto", trovati)
+	end
+end
+
+function comandi.script()
+	stampaScriptEstranei()
+	return "Elenco degli script estranei aperto sullo schermo."
 end
 
 function comandi.centro()
@@ -113,11 +202,27 @@ function comandi.centro()
 		or (numero .. " oggetti estranei al centro: guarda la finestra Output.")
 end
 
+-- Toglie per questa partita gli oggetti estranei trovati al centro.
+function comandi.pulisci()
+	local righe, oggetti = oggettiEstraneiAlCentro()
+	for _, oggetto in ipairs(oggetti) do
+		oggetto:Destroy()
+	end
+	for _, riga in ipairs(righe) do
+		warn("[Regno Arcano] /pulisci ha rimosso: " .. riga)
+	end
+	return #oggetti == 0 and "Niente da pulire al centro."
+		or (#oggetti .. " oggetti rimossi per questa partita (elencati nell'Output).")
+end
+
 function StudioService.Avvia()
 	if not RunService:IsStudio() then
 		return
 	end
+	-- Due controlli: subito dopo l'avvio e più tardi, nel caso qualcosa compaia in ritardo.
 	task.delay(5, stampaDiagnosi)
+	task.delay(30, stampaDiagnosi)
+	task.delay(8, stampaScriptEstranei)
 	local function esegui(player, nome)
 		local comando = comandi[nome]
 		if comando and PlayerData.Pronto(player) then
@@ -151,7 +256,7 @@ function StudioService.Avvia()
 			collega(player)
 		end
 	end
-	print("[Regno Arcano] Comandi di test attivi: /risorse, /oggetti, /reset, /centro")
+	print("[Regno Arcano] Comandi di test attivi: /risorse, /oggetti, /reset, /centro, /pulisci, /script")
 end
 
 return StudioService

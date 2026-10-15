@@ -84,9 +84,9 @@ Da **non** cambiare dopo la pubblicazione: il nome del DataStore in `PlayerData.
 - [x] 4. Primo dungeon: Rovine Dimenticate, boss, loot a rarità
 - [x] 5. Piazza: ponti, Mercante, Bacheca missioni, Portale della Gilda, targhette
 - [x] 6. Espansione
-  - [x] Menu dell'inventario (tasto I)
+  - [x] Menu dell'inventario (tasto X)
   - [x] Secondo dungeon: Cripta di Ghiaccio
   - [x] Abilità speciali (tasto Q)
-  - [x] Pozioni (Alchimista, tasti Z/X/C) e Fabbro (+1 ... +10)
+  - [x] Pozioni (Alchimista, tasti Z/V/C) e Fabbro (+1 ... +10)
   - [x] Scambi tra giocatori (tasto T nella Piazza)
   - [x] Pubblicazione: blocco di sessione, salvataggi raggruppati, tutorial, pulsanti per telefono

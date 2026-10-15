@@ -68,6 +68,9 @@
         },
         "ElencoDungeon": {
           "$className": "RemoteFunction"
+        },
+        "Diagnosi": {
+          "$className": "RemoteEvent"
         }
       }
     },

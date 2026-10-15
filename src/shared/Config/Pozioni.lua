@@ -36,7 +36,7 @@ Pozioni.Dati = {
 		durata = 30,
 		ricarica = 30,
 		massimo = 10,
-		tasto = Enum.KeyCode.X,
+		tasto = Enum.KeyCode.V, -- X è il tasto dell'inventario
 	},
 	Pietra = {
 		nome = "Pozione di Pietra",

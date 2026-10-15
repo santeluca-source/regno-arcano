@@ -284,8 +284,23 @@ end)
 vaiBase.Activated:Connect(function()
 	viaggia("Base")
 end)
-UserInputService.InputBegan:Connect(function(input, gestito)
-	if not gestito and input.KeyCode == Enum.KeyCode.M then
+-- Come per l'inventario: la ripetizione automatica della tastiera manda una raffica
+-- di eventi che richiuderebbe subito il menu. Una pressione conta solo se da 0,6
+-- secondi non è arrivato nessun evento del tasto M.
+local ultimoEventoM = -math.huge
+UserInputService.InputBegan:Connect(function(input)
+	if input.KeyCode ~= Enum.KeyCode.M or UserInputService:GetFocusedTextBox() then
+		return
+	end
+	local ora = os.clock()
+	local fresca = ora - ultimoEventoM > 0.6
+	ultimoEventoM = ora
+	if fresca then
 		alterna()
+	end
+end)
+UserInputService.InputEnded:Connect(function(input)
+	if input.KeyCode == Enum.KeyCode.M then
+		ultimoEventoM = os.clock()
 	end
 end)

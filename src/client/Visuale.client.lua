@@ -58,6 +58,15 @@ for _, dimensione in ipairs({ Vector2.new(2, 22), Vector2.new(22, 2) }) do
 	bordo.Parent = barra
 end
 
+-- I riquadri "Tieni premuto E" dei ProximityPrompt sono anche pulsanti cliccabili:
+-- con il mouse bloccato al centro, quando il centro dello schermo ci passa sopra
+-- Roblox crede che si stia puntando un pulsante e smette di girare la telecamera.
+-- Su computer li rendiamo non cliccabili (solo per noi): si usa comunque il tasto.
+local ProximityPromptService = game:GetService("ProximityPromptService")
+ProximityPromptService.PromptShown:Connect(function(prompt)
+	prompt.ClickablePrompt = false
+end)
+
 local function finestraAperta()
 	for nome, valore in pairs(player:GetAttributes()) do
 		if valore == true and nome:sub(1, 9) == "Finestra_" then

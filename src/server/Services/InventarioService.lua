@@ -6,7 +6,7 @@
 -- Gli effetti (danno, vita, valore di vendita) sono in Config/Equipaggiamento.lua.
 --
 -- Un oggetto migliore di quello indossato viene messo addosso in automatico;
--- dal menu dell'inventario (tasto I) il giocatore può poi scegliere e vendere.
+-- dal menu dell'inventario (tasto X) il giocatore può poi scegliere e vendere.
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")

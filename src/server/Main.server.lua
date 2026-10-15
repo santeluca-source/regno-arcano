@@ -28,6 +28,25 @@ else
 	print("[Regno Arcano] Nessun resto del vecchio prototipo: tutto pulito.")
 end
 
+-- Un vecchio script nel place potrebbe ricostruire questi oggetti DOPO la pulizia:
+-- li sorvegliamo per tutta la partita e li togliamo appena compaiono.
+local Workspace = game:GetService("Workspace")
+local nomiVietati = {}
+for _, residuo in ipairs(residui) do
+	if residuo[1] == Workspace then
+		nomiVietati[residuo[2]] = true
+	end
+end
+Workspace.ChildAdded:Connect(function(figlio)
+	if nomiVietati[figlio.Name] then
+		task.defer(function()
+			figlio:Destroy()
+		end)
+		warn("[Regno Arcano] Uno script del place ha ricreato " .. figlio.Name
+			.. ": rimosso. In Studio l'Output elenca gli script estranei da eliminare.")
+	end
+end)
+
 local ordine = {
 	"PlayerData",
 	"InventarioService",
