@@ -36,6 +36,7 @@ local ordine = {
 	"CombatService",
 	"AbilitaService",
 	"PozioniService",
+	"MovimentoService",
 	"DungeonService",
 	"MissioniService",
 	"TutorialService",

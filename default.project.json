@@ -53,6 +53,9 @@
         },
         "AzioneScambio": {
           "$className": "RemoteEvent"
+        },
+        "Capriola": {
+          "$className": "RemoteEvent"
         }
       }
     },
@@ -64,6 +67,9 @@
     },
 
     "StarterPlayer": {
+      "$properties": {
+        "EnableMouseLockOption": false
+      },
       "StarterPlayerScripts": {
         "Client": {
           "$path": "src/client"

@@ -16,6 +16,7 @@ local Rarita = require(ReplicatedStorage.Shared.Config.Rarita)
 local PlayerData = require(script.Parent.PlayerData)
 local InventarioService = require(script.Parent.InventarioService)
 local Effetti = require(script.Parent.Parent.Combattimento.Effetti)
+local Velocita = require(script.Parent.Parent.Combattimento.Velocita)
 
 local Remotes = ReplicatedStorage.Remotes
 
@@ -89,6 +90,10 @@ end
 function CombatService.ColpisciGiocatore(humanoid, quantita, rallenta)
 	local player = Players:GetPlayerFromCharacter(humanoid.Parent)
 	if player then
+		-- Durante la capriola il colpo va a vuoto.
+		if Effetti.Attivo(player, "Schivata") then
+			return
+		end
 		local furia = Effetti.Attivo(player, "Furia")
 		if furia then
 			quantita *= furia.dannoSubito
@@ -117,10 +122,10 @@ function CombatService.ColpisciGiocatore(humanoid, quantita, rallenta)
 		if rallenta and player then
 			Effetti.Aggiungi(player, "Gelo", rallenta.durata, {}, Color3.fromRGB(150, 220, 255), function()
 				if humanoid.Parent then
-					humanoid.WalkSpeed = velocitaClasse(player)
+					Velocita.Imposta(humanoid, velocitaClasse(player))
 				end
 			end)
-			humanoid.WalkSpeed = velocitaClasse(player) * rallenta.fattore
+			Velocita.Imposta(humanoid, velocitaClasse(player) * rallenta.fattore)
 		end
 	end
 end

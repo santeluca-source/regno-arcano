@@ -8,6 +8,7 @@ local Classi = require(ReplicatedStorage.Shared.Config.Classi)
 local PlayerData = require(script.Parent.PlayerData)
 local TycoonService = require(script.Parent.TycoonService)
 local InventarioService = require(script.Parent.InventarioService)
+local Velocita = require(script.Parent.Parent.Combattimento.Velocita)
 
 local Remotes = ReplicatedStorage.Remotes
 local ATTESA_TRA_CAMBI = 1
@@ -28,7 +29,7 @@ local function applicaStatistiche(player)
 	local percentualeVita = humanoid.MaxHealth > 0 and humanoid.Health / humanoid.MaxHealth or 1
 	humanoid.MaxHealth = vita
 	humanoid.Health = vita * percentualeVita
-	humanoid.WalkSpeed = statistiche.velocita
+	Velocita.Imposta(humanoid, statistiche.velocita)
 end
 
 -- Punto unico per cambiare classe: lo usano il menu, gli altari della base, ecc.
