@@ -54,7 +54,10 @@
         "AzioneScambio": {
           "$className": "RemoteEvent"
         },
-        "Capriola": {
+        "Scatto": {
+          "$className": "RemoteEvent"
+        },
+        "Corsa": {
           "$className": "RemoteEvent"
         }
       }

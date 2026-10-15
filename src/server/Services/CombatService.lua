@@ -90,7 +90,7 @@ end
 function CombatService.ColpisciGiocatore(humanoid, quantita, rallenta)
 	local player = Players:GetPlayerFromCharacter(humanoid.Parent)
 	if player then
-		-- Durante la capriola il colpo va a vuoto.
+		-- Durante lo scatto il colpo va a vuoto.
 		if Effetti.Attivo(player, "Schivata") then
 			return
 		end
