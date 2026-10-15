@@ -1,21 +1,23 @@
--- Corsa (Shift tenuto) e scatto (Ctrl), con la barra della resistenza.
+-- Corsa (Shift tenuto), scatto (Ctrl) e doppio salto, con la barra della resistenza.
 -- Su telefono e controller ContextActionService crea i pulsanti da solo.
 -- Il movimento lo fa il client; il server dà l'invulnerabilità dello scatto
 -- e pubblica lo stato agli altri giocatori. Pose e immagini residue sono in
--- Animazioni.client. Qui ci sono anche gli effetti "anime" della corsa (visuale
--- più ampia, linee di velocità) e la visuale fissa in terza persona.
+-- Animazioni.client, la visuale in Visuale.client. Qui ci sono anche gli effetti
+-- "anime" della corsa (visuale più ampia, linee di velocità).
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local ContextActionService = game:GetService("ContextActionService")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 local Workspace = game:GetService("Workspace")
 
 local Movimento = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"):WaitForChild("Movimento"))
 local Remotes = ReplicatedStorage:WaitForChild("Remotes")
 local RemoteScatto = Remotes:WaitForChild("Scatto")
 local RemoteCorsa = Remotes:WaitForChild("Corsa")
+local RemoteDoppioSalto = Remotes:WaitForChild("DoppioSalto")
 
 local player = Players.LocalPlayer
 local Corsa, Scatto, Resistenza, Visuale = Movimento.Corsa, Movimento.Scatto, Movimento.Resistenza, Movimento.Visuale
@@ -28,13 +30,10 @@ local stato = {
 	inScatto = false,
 	prossimoScatto = 0,
 	ultimoConsumo = 0,
+	aTerra = true,
+	staccoDaTerra = 0,
+	doppioUsato = false,
 }
-
--- Visuale: sempre terza persona, sempre alla stessa distanza ---------------------
-
-player.CameraMode = Enum.CameraMode.Classic
-player.CameraMinZoomDistance = Visuale.distanza
-player.CameraMaxZoomDistance = Visuale.distanza
 
 local function personaggio()
 	local character = player.Character
@@ -147,6 +146,59 @@ local function scatto()
 		humanoid.AutoRotate = true
 		stato.inScatto = false
 	end)
+end
+
+-- Doppio salto ---------------------------------------------------------------------
+-- JumpRequest arriva da tastiera, telefono e controller. Tenendo premuto salto arriva
+-- di continuo: consideriamo "nuova pressione" solo una richiesta dopo una pausa.
+
+local ultimaRichiestaSalto = 0
+local velocitaDoppioSalto = math.sqrt(2 * Workspace.Gravity * Movimento.DoppioSalto.altezza)
+
+local function doppioSalto()
+	local character, humanoid, radice = personaggio()
+	local ora = os.clock()
+	local nuovaPressione = ora - ultimaRichiestaSalto > 0.2
+	ultimaRichiestaSalto = ora
+	if not character or not nuovaPressione or stato.doppioUsato or stato.inScatto then
+		return
+	end
+	local statoHumanoid = humanoid:GetState()
+	local inAria = statoHumanoid == Enum.HumanoidStateType.Freefall or statoHumanoid == Enum.HumanoidStateType.Jumping
+	if not inAria or ora - stato.staccoDaTerra < 0.12 or stato.resistenza < Movimento.DoppioSalto.costo then
+		return
+	end
+	stato.doppioUsato = true
+	consuma(Movimento.DoppioSalto.costo)
+	local velocita = radice.AssemblyLinearVelocity
+	radice.AssemblyLinearVelocity = Vector3.new(velocita.X, velocitaDoppioSalto, velocita.Z)
+	character:SetAttribute("DoppioSaltoLocale", ora) -- letto da Animazioni.client per la posa
+	RemoteDoppioSalto:FireServer()
+end
+
+UserInputService.JumpRequest:Connect(doppioSalto)
+
+local function collegaSalti(character)
+	local humanoid = character:WaitForChild("Humanoid", 5)
+	if not humanoid then
+		return
+	end
+	humanoid.StateChanged:Connect(function(_, nuovo)
+		if nuovo == Enum.HumanoidStateType.Jumping or nuovo == Enum.HumanoidStateType.Freefall then
+			if stato.aTerra then
+				stato.aTerra = false
+				stato.staccoDaTerra = os.clock()
+			end
+		elseif nuovo == Enum.HumanoidStateType.Landed or nuovo == Enum.HumanoidStateType.Running then
+			-- Toccare terra ricarica il doppio salto.
+			stato.aTerra = true
+			stato.doppioUsato = false
+		end
+	end)
+end
+player.CharacterAdded:Connect(collegaSalti)
+if player.Character then
+	task.spawn(collegaSalti, player.Character)
 end
 
 -- Effetti della corsa: visuale più ampia e linee di velocità ------------------------
@@ -293,5 +345,7 @@ player.CharacterAdded:Connect(function()
 	stato.esausto = false
 	stato.inScatto = false
 	stato.correndo = false
+	stato.aTerra = true
+	stato.doppioUsato = false
 	RemoteCorsa:FireServer(false)
 end)

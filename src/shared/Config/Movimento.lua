@@ -1,4 +1,4 @@
--- Corsa (Shift tenuto) e scatto (Ctrl), con una barra di resistenza.
+-- Corsa (Shift tenuto), scatto (Ctrl) e doppio salto, con una barra di resistenza.
 -- Su telefono e controller compaiono pulsanti dedicati.
 
 local Movimento = {}
@@ -18,8 +18,20 @@ Movimento.Scatto = {
 	-- Per tutta la durata dello scatto non si subiscono danni.
 }
 
--- Visuale: terza persona fissa; durante la corsa si allarga (effetto "anime").
+Movimento.DoppioSalto = {
+	altezza = 9, -- stud del secondo salto
+	costo = 15, -- resistenza
+	durataPosa = 0.4, -- secondi della posa raccolta in aria
+}
+
+-- Visuale: terza persona fissa, bloccata come lo "shift lock" (cursore nascosto,
+-- il personaggio guarda dove guarda la telecamera, mirino al centro).
+-- Tenendo premuto `tastoCursore`, o con una finestra aperta, il cursore torna libero.
+-- Durante la corsa la visuale si allarga (effetto "anime").
 Movimento.Visuale = {
+	bloccata = true,
+	spalla = Vector3.new(1.75, 0.4, 0), -- telecamera un po' a destra e in alto, sopra la spalla
+	tastoCursore = Enum.KeyCode.LeftAlt,
 	distanza = 13, -- stud tra telecamera e personaggio (non si può zoomare)
 	campoVisivo = 70,
 	campoVisivoCorsa = 84,

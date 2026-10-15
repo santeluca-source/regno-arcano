@@ -46,6 +46,27 @@ Pose.Scatto = {
 	},
 }
 
+Pose.DoppioSalto = {
+	-- Doppio salto: ginocchia raccolte, braccia aperte in alto.
+	R15 = {
+		Waist = A(rad(-12), 0, 0),
+		LeftHip = A(rad(75), 0, 0),
+		RightHip = A(rad(55), 0, 0),
+		LeftKnee = A(rad(-95), 0, 0),
+		RightKnee = A(rad(-85), 0, 0),
+		LeftShoulder = A(rad(35), 0, rad(-40)),
+		RightShoulder = A(rad(35), 0, rad(40)),
+		LeftElbow = A(rad(25), 0, 0),
+		RightElbow = A(rad(25), 0, 0),
+	},
+	R6 = {
+		["Right Shoulder"] = A(0, 0, rad(60)),
+		["Left Shoulder"] = A(0, 0, rad(-60)),
+		["Right Hip"] = A(0, 0, rad(60)),
+		["Left Hip"] = A(0, 0, rad(-60)),
+	},
+}
+
 Pose.CorsaAnime = {
 	-- Corsa "anime": busto in avanti, testa alta, braccia tese all'indietro.
 	-- Le gambe restano quelle dell'animazione di corsa di Roblox.

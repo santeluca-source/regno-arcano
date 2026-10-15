@@ -1,7 +1,8 @@
--- Anima corsa "anime" e scatto su TUTTI i personaggi visibili.
+-- Anima corsa "anime", scatto e doppio salto su TUTTI i personaggi visibili.
 --   - il proprio personaggio: legge gli attributi locali messi da Movimento.client
---     ("CorsaLocale", "ScattoProgresso"), così la risposta è immediata
---   - gli altri giocatori: legge gli attributi pubblicati dal server ("Corsa", "InScatto")
+--     ("CorsaLocale", "ScattoProgresso", "DoppioSaltoLocale"), così la risposta è immediata
+--   - gli altri giocatori: legge gli attributi pubblicati dal server
+--     ("Corsa", "InScatto", "DoppiSalti")
 -- Effetti: scie di vento sulle mani durante la corsa; durante lo scatto immagini
 -- residue luminose (del colore della classe) e un anello di vento alla partenza.
 
@@ -217,11 +218,30 @@ local function aggiorna(character, eMio, dt)
 		immagineResidua(character, coloreClasse(character))
 	end
 
-	-- Prima la corsa, poi lo scatto sopra: passando dall'una all'altro si sfumano
+	-- Doppio salto: per sé l'ora del salto, per gli altri un contatore dal server.
+	local segnaleSalto = eMio and character:GetAttribute("DoppioSaltoLocale") or (not eMio and character:GetAttribute("DoppiSalti"))
+	if segnaleSalto and segnaleSalto ~= stato.ultimoSegnaleSalto then
+		if stato.ultimoSegnaleSalto ~= nil or eMio then
+			stato.inizioDoppioSalto = ora
+			anelloDiVento(character, coloreClasse(character))
+		end
+		stato.ultimoSegnaleSalto = segnaleSalto
+	end
+	local pesoSalto = 0
+	if stato.inizioDoppioSalto then
+		local trascorso = ora - stato.inizioDoppioSalto
+		local durata = Movimento.DoppioSalto.durataPosa
+		pesoSalto = math.min(morbido(trascorso / 0.08), morbido((durata - trascorso) / (durata * 0.6)))
+	end
+
+	-- Prima la corsa, poi salto e scatto sopra: passando dall'uno all'altro si sfumano
 	-- insieme invece di scattare. Le curve morbide evitano partenze e arrivi bruschi.
 	local pesoScatto = stato.pesoScatto
 	if stato.pesoCorsa > 0 then
-		Pose.Applica(stato.tipo, stato.giunti, Pose.CorsaAnime, morbido(stato.pesoCorsa) * (1 - pesoScatto))
+		Pose.Applica(stato.tipo, stato.giunti, Pose.CorsaAnime, morbido(stato.pesoCorsa) * (1 - math.max(pesoScatto, pesoSalto)))
+	end
+	if pesoSalto > 0 then
+		Pose.Applica(stato.tipo, stato.giunti, Pose.DoppioSalto, pesoSalto * (1 - pesoScatto))
 	end
 	if pesoScatto > 0 then
 		Pose.Applica(stato.tipo, stato.giunti, Pose.Scatto, pesoScatto)

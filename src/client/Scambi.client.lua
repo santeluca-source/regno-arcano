@@ -429,6 +429,14 @@ task.spawn(function()
 	end
 end)
 
+-- Con la finestra o l'avviso aperti il cursore torna libero (vedi Visuale.client).
+finestra:GetPropertyChangedSignal("Visible"):Connect(function()
+	player:SetAttribute("Finestra_Scambio", finestra.Visible)
+end)
+avviso:GetPropertyChangedSignal("Visible"):Connect(function()
+	player:SetAttribute("Finestra_AvvisoScambio", avviso.Visible)
+end)
+
 -- Prompt "Proponi scambio": visibile solo nella Piazza e mai sul proprio personaggio.
 local function nellaPiazza()
 	local character = player.Character

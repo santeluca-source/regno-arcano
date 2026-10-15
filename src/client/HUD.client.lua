@@ -258,6 +258,11 @@ bottoneClassi.Activated:Connect(function()
 	menu.Visible = not menu.Visible
 end)
 
+-- Con il menu aperto il cursore torna libero (vedi Visuale.client).
+menu:GetPropertyChangedSignal("Visible"):Connect(function()
+	player:SetAttribute("Finestra_Classi", menu.Visible)
+end)
+
 -- L'Altare delle Classi sull'isola apre lo stesso menu.
 Remotes:WaitForChild("ApriMenuClassi").OnClientEvent:Connect(function()
 	menu.Visible = true

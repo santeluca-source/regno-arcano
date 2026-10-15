@@ -40,6 +40,22 @@ local function scatto(player)
 	end)
 end
 
+-- Il doppio salto lo fa il client; qui contiamo i salti sul personaggio così gli
+-- altri client vedono posa e anello di vento ("DoppiSalti" cambia a ogni salto).
+local ultimoDoppioSalto = {} -- [Player] = os.clock()
+
+local function doppioSalto(player)
+	local ora = os.clock()
+	if ora - (ultimoDoppioSalto[player] or -math.huge) < 0.3 then
+		return
+	end
+	ultimoDoppioSalto[player] = ora
+	local character = player.Character
+	if character then
+		character:SetAttribute("DoppiSalti", (character:GetAttribute("DoppiSalti") or 0) + 1)
+	end
+end
+
 local function corsa(player, attiva)
 	if type(attiva) ~= "boolean" then
 		return
@@ -58,9 +74,11 @@ end
 function MovimentoService.Avvia()
 	Remotes.Scatto.OnServerEvent:Connect(scatto)
 	Remotes.Corsa.OnServerEvent:Connect(corsa)
+	Remotes.DoppioSalto.OnServerEvent:Connect(doppioSalto)
 	Players.PlayerRemoving:Connect(function(player)
 		ultimoScatto[player] = nil
 		ultimoCambioCorsa[player] = nil
+		ultimoDoppioSalto[player] = nil
 	end)
 end
 

@@ -463,6 +463,7 @@ end
 
 local function mostra(visibile, fabbro)
 	finestra.Visible = visibile
+	player:SetAttribute("Finestra_Inventario", visibile) -- libera il cursore (Visuale.client)
 	stato.fabbro = visibile and fabbro == true
 	aggiornaLista()
 	aggiornaDettaglio()

@@ -59,6 +59,9 @@
         },
         "Corsa": {
           "$className": "RemoteEvent"
+        },
+        "DoppioSalto": {
+          "$className": "RemoteEvent"
         }
       }
     },
