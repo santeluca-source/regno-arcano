@@ -42,6 +42,7 @@ local ordine = {
 	"TutorialService",
 	"PiazzaService",
 	"ScambiService",
+	"ViaggiService",
 	"StudioService", -- comandi di test, solo in Studio
 }
 

@@ -462,6 +462,12 @@ function DungeonService.InDungeon(player)
 	return partitaDi[player] ~= nil
 end
 
+-- Fa uscire un giocatore dalla sua partita (es. teletrasporto dal menu Viaggi).
+-- Non lo sposta: ci pensa chi chiama.
+function DungeonService.Esci(player)
+	rimuoviGiocatore(player, "Hai lasciato il dungeon.")
+end
+
 function DungeonService.Avvia()
 	cartellaDungeon = Instance.new("Folder")
 	cartellaDungeon.Name = "Dungeon"

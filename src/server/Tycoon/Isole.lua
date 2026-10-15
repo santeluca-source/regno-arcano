@@ -1,5 +1,6 @@
 -- Genera le isole personali disposte ad anello attorno al centro del mondo.
--- Il centro resta libero: lì sorgerà la Piazza multiplayer (fase 5).
+-- Al centro c'è la Piazza multiplayer; ci si arriva a piedi dai ponti o con il
+-- teletrasporto del menu Viaggi.
 
 local Workspace = game:GetService("Workspace")
 
@@ -10,7 +11,7 @@ local Isole = {}
 
 Isole.Numero = 8
 Isole.Lato = 100 -- l'isola è un quadrato di 100x100 stud
-Isole.RaggioAnello = 190
+Isole.RaggioAnello = 340 -- distanza dal centro: i ponti verso la Piazza sono lunghi ~200 stud
 Isole.Altezza = 4 -- quota del prato
 
 -- Crea (o ricrea) tutte le isole e restituisce la cartella che le contiene.

@@ -34,7 +34,7 @@ Tutorial.Passi = {
 		ricompensa = { Essenza = 30 },
 	},
 	{
-		testo = "Attraversa il ponte davanti alla tua isola e raggiungi la Piazza.",
+		testo = "Raggiungi la Piazza: premi M (menu Viaggi) e scegli «Piazza», oppure attraversa il ponte.",
 		evento = "Piazza",
 		ricompensa = { Oro = 150 },
 	},
@@ -44,7 +44,7 @@ Tutorial.Passi = {
 		ricompensa = { Frammenti = 5 },
 	},
 	{
-		testo = "Entra nel portale e completa le Rovine Dimenticate!",
+		testo = "Entra nelle Rovine Dimenticate (dal portale o dal menu Viaggi, tasto M) e completale!",
 		evento = "Dungeon", dungeon = "Rovine",
 		ricompensa = { Oro = 1000, Frammenti = 10 },
 	},

@@ -74,12 +74,19 @@ Dungeon.Nemici = {
 --   tabellaNemici / tabellaForziere   tabelle di rarità (Config/Rarita.lua)
 --   potenza          moltiplicatore della potenza degli oggetti trovati qui
 --   tema             colori e materiali della mappa
+--   portale          oggetto dell'isola che sblocca il dungeon; serve anche per entrarci
+--                    dal menu Viaggi (tasto M)
+--   descrizione, difficolta, colore   mostrati nel menu Viaggi
 
 Dungeon.Ordine = { "Rovine", "Cripta" }
 
 Dungeon.Elenco = {
 	Rovine = {
 		nome = "Rovine Dimenticate",
+		descrizione = "Antiche sale invase da scheletri e arcieri spettrali.",
+		difficolta = "Facile",
+		colore = Color3.fromRGB(177, 72, 255),
+		portale = "Portale", -- oggetto dell'isola che sblocca il dungeon (anche dal menu Viaggi)
 		sale = {
 			{ Scheletro = 3 },
 			{ Scheletro = 3, Arciere = 2 },
@@ -101,6 +108,10 @@ Dungeon.Elenco = {
 	},
 	Cripta = {
 		nome = "Cripta di Ghiaccio",
+		descrizione = "Lupi, spettri che rallentano e la gelida Regina dei Ghiacci.",
+		difficolta = "Difficile",
+		colore = Color3.fromRGB(120, 210, 255),
+		portale = "PortaleCripta",
 		sale = {
 			{ LupoGlaciale = 3, SpettroGhiaccio = 1 },
 			{ LupoGlaciale = 2, SpettroGhiaccio = 3 },

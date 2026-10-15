@@ -1,6 +1,7 @@
 -- Visuale: terza persona fissa (niente zoom né prima persona) e, con mouse e
 -- tastiera, bloccata come lo "shift lock": cursore nascosto, telecamera sopra la
--- spalla, il personaggio guarda dove guarda la telecamera, mirino al centro.
+-- spalla, il personaggio guarda dove guarda la telecamera; con l'arma in mano
+-- compare il mirino al centro.
 --
 -- Il cursore torna libero:
 --   - tenendo premuto il tasto `tastoCursore` (Alt)
@@ -75,7 +76,9 @@ RunService:BindToRenderStep("VisualeBloccata", Enum.RenderPriority.Camera.Value 
 	local radice = character and character:FindFirstChild("HumanoidRootPart")
 	local libero = UserInputService:IsKeyDown(Visuale.tastoCursore) or finestraAperta()
 
-	mirino.Visible = not libero
+	-- Il mirino si vede solo con l'arma della classe in mano.
+	local arma = character and character:FindFirstChildOfClass("Tool")
+	mirino.Visible = not libero and arma ~= nil and arma:GetAttribute("ArmaClasse") ~= nil
 	if libero then
 		UserInputService.MouseBehavior = Enum.MouseBehavior.Default
 		UserInputService.MouseIconEnabled = true
